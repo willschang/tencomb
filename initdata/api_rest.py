@@ -103,6 +103,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
                 # 事务处理
                 with transaction.atomic():
                     print(item_key)
+                    print(values)
                     try:
                         # 将数据同步到内存变量中去
                         if item_key in ITEMVALUES[pro_name].keys():
