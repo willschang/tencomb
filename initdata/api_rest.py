@@ -96,7 +96,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
             data = serializer.data
             pro_name = data.get('pro_name')
             item_key = data.get('item_key')
-            values = data.get('values', '未赋值')
+            values = data.get('values') if data.get('values') else 'none'
 
             if pro_name not in PROBASEINFO.keys():
                 return Response({'error': '该项目名不存在，请重新输入！'})
