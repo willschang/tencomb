@@ -43,6 +43,7 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
                     serializer.save()
                     # 将数据同步到内存变量中去
                     PROBASEINFO[pro_name] = data.get('description', ' ') + '#' + data.get('item_name', ' ')
+                    ITEMVALUES[pro_name] = {}
                     return Response({'status': 'ok'})
                     # return Response({pro_name: PROBASEINFO[pro_name]})
         else:
