@@ -91,7 +91,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
         '''
 
         serializer = self.get_serializer(data=request.data)
-        print(serializer.data)
+        print(request.data)
         if serializer.is_valid():
             data = serializer.data
             pro_name = data.get('pro_name')
