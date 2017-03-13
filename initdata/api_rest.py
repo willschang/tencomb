@@ -69,7 +69,7 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
 
         '''
         pro_name = request.GET.get('pro_name')
-        print(pro_name)
+        # print(pro_name)
         if pro_name and pro_name in PROBASEINFO.keys():
             return Response({pro_name: PROBASEINFO[pro_name]})
         else:
