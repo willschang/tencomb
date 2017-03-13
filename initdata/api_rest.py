@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .serializers import ProjectBaseInfoSerializer, ProjectItemValuesSerializer
 from rest_framework.decorators import list_route, detail_route
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db import transaction
 from .models import ProjectBaseInfo, ProjectItemValues
 from .utils import data_initial
@@ -20,7 +21,8 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
     '''
     queryset = ProjectBaseInfo.objects.all()
     serializer_class = ProjectBaseInfoSerializer
-    
+
+    @csrf_exempt
     @list_route(methods=['POST'])
     def set_project_info(self, request, *args, **kwargs):
         '''
@@ -40,8 +42,9 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
                     # 保存数据到数据库
                     serializer.save()
                     # 将数据同步到内存变量中去
-                    PROBASEINFO[pro_name] = data.get('description') + ',' + data.get('item_name')
-                    return Response({pro_name: PROBASEINFO[pro_name]})
+                    PROBASEINFO[pro_name] = data.get('description', ' ') + '#' + data.get('item_name', ' ')
+                    return Response({'status': 'ok'})
+                    # return Response({pro_name: PROBASEINFO[pro_name]})
         else:
             error_info = serializer.errors
 
@@ -91,18 +94,23 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
             data = serializer.data
             pro_name = data.get('pro_name')
             item_key = data.get('item_key')
-            values = data.get('values')
+            values = data.get('values', '未赋值')
 
             if pro_name not in PROBASEINFO.keys():
                 return Response({'error': '该项目名不存在，请重新输入！'})
             else:
                 # 事务处理
                 with transaction.atomic():
+                    print(item_key)
                     # 将数据同步到内存变量中去
-                    ITEMVALUES[pro_name].setdefault(item_key, values)
+                    if item_key in ITEMVALUES[pro_name].keys():
+                        ITEMVALUES[pro_name][item_key] = values
+                    else:
+                        ITEMVALUES[pro_name].setdefault(item_key, values)
+                    print(ITEMVALUES[pro_name])
                     # 保存数据到数据库
                     serializer.save()
-                    return Response({pro_name: ITEMVALUES[pro_name]})
+                    return Response({'status': 'ok'})
         else:
             error_info = serializer.errors
             return Response({'error': error_info})
