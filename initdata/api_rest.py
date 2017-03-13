@@ -91,7 +91,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
         '''
 
         serializer = self.get_serializer(data=request.data)
-        print(request.data)
+        # print(request.data)
         if serializer.is_valid():
             data = serializer.data
             pro_name = data.get('pro_name')
@@ -103,15 +103,15 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
             else:
                 # 事务处理
                 with transaction.atomic():
-                    print(item_key)
-                    print(values)
+                    # print(item_key)
+                    # print(values)
                     try:
                         # 将数据同步到内存变量中去
                         if item_key in ITEMVALUES[pro_name].keys():
                             ITEMVALUES[pro_name][item_key] = values
                         else:
                             ITEMVALUES[pro_name].setdefault(item_key, values)
-                        print(ITEMVALUES[pro_name])
+                        # print(ITEMVALUES[pro_name])
                     except Exception as e:
                         return Response({'error': e})
                     # 保存数据到数据库
