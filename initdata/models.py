@@ -7,7 +7,7 @@ from django.db import models
 class ProjectBaseInfo(models.Model):
     pro_name = models.CharField('项目名称', max_length=250, db_index=True, unique=True, help_text='项目名称') 
     description = models.CharField('项目描述', max_length=200, help_text='项目描述')
-    item_name = models.CharField('项目映射值', max_length=500, help_text='项目属性,如"ip,addr,port,..."')
+    item_name = models.CharField('项目映射值', max_length=1000, help_text='项目属性,如"ip,addr,port,..."')
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
@@ -15,10 +15,7 @@ class ProjectBaseInfo(models.Model):
 class ProjectItemValues(models.Model): 
     pro_name = models.CharField('项目名称', max_length=250, db_index=True, help_text='项目名称')
     item_key = models.CharField('记录的key值', max_length=100, help_text='应用key值')
-    values = models.CharField('记录值', max_length=1000, default='应用的基本信息', help_text='应用的基本信息, 如"192.168.1.10,xiamen china,80,..."')
+    values = models.CharField('记录值', max_length=1000, help_text='应用的基本信息, 如"192.168.1.10,xiamen china,80,..."')
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-
-# from initdata.utils import data_initial
-# print('init data .....')

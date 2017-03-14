@@ -7,17 +7,17 @@ from .models import ProjectBaseInfo, ProjectItemValues
 @singleton
 class DataIniting():
     def __init__(self):
-        # 用于存储各应用的基本信息，proBase
-        self.proBase = {}
-        # 存储各应用的各详细信息，proItemValue
-        self.proItemValue = {}
+        # 用于存储各应用的基本信息，project_base_info
+        self.project_base_info = {}
+        # 存储各应用的各详细信息，project_item_values
+        self.project_item_values = {}
 
         try:
             pro_data = ProjectBaseInfo.objects.all().order_by('-id')
-            # 遍历所用应用的数据存储到proBase字典中去
+            # 遍历所用应用的数据存储到project_base_info字典中去
             for d in pro_data:
                 pro_name = d.pro_name
-                self.proBase[d.pro_name] = d.description + '#' + d.item_name
+                self.project_base_info[d.pro_name] = d.description + '#' + d.item_name
                 # 取得某个应用里所有数据
                 pro_items = ProjectItemValues.objects.filter(pro_name=pro_name)
                 # 用于存储各应用里的数据
@@ -26,7 +26,7 @@ class DataIniting():
                     if item.item_key:
                         item_values.setdefault(item.item_key, item.values)
                     
-                self.proItemValue[pro_name] = item_values
+                self.project_item_values[pro_name] = item_values
             print('init data begin ...')
             print('====================')
             print('init data finish...')

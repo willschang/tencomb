@@ -9,10 +9,10 @@ from django.db import transaction
 from .models import ProjectBaseInfo, ProjectItemValues
 from .utils import data_initial
 
-# 存储平台上的各项目基础信息PROBASEINFO
-PROBASEINFO = data_initial.proBase
-# 存储平台上的各项目的各应用基础信息ITEMVALUES
-ITEMVALUES = data_initial.proItemValue
+# 存储平台上的各项目基础信息PROJECT_BASE_INFO
+PROJECT_BASE_INFO = data_initial.project_base_info
+# 存储平台上的各项目的各应用基础信息PROJECT_ITEM_VALUES
+PROJECT_ITEM_VALUES = data_initial.project_item_values
 
 
 class ProjectBaseViewSet(viewsets.GenericViewSet):
@@ -34,7 +34,7 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
             data = serializer.data
             pro_name = data.get('pro_name')
 
-            if pro_name in PROBASEINFO.keys():
+            if pro_name in PROJECT_BASE_INFO.keys():
                 return Response({'error': '该项目名已存在，请重新设置名称！'})
             else:
                 # 事务处理
@@ -42,10 +42,10 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
                     # 保存数据到数据库
                     serializer.save()
                     # 将数据同步到内存变量中去
-                    PROBASEINFO[pro_name] = data.get('description', ' ') + '#' + data.get('item_name', ' ')
-                    ITEMVALUES[pro_name] = {}
+                    PROJECT_BASE_INFO[pro_name] = data.get('description', ' ') + '#' + data.get('item_name', ' ')
+                    PROJECT_ITEM_VALUES[pro_name] = {}
                     return Response({'status': 'ok'})
-                    # return Response({pro_name: PROBASEINFO[pro_name]})
+                    # return Response({pro_name: PROJECT_BASE_INFO[pro_name]})
         else:
             error_info = serializer.errors
 
@@ -58,7 +58,7 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
 
         '''
 
-        return Response(PROBASEINFO)
+        return Response(PROJECT_BASE_INFO)
 
     @list_route(methods=['GET'])
     def get_project(self, request, *args, **kwargs):
@@ -70,8 +70,8 @@ class ProjectBaseViewSet(viewsets.GenericViewSet):
         '''
         pro_name = request.GET.get('pro_name')
         # print(pro_name)
-        if pro_name and pro_name in PROBASEINFO.keys():
-            return Response({pro_name: PROBASEINFO[pro_name]})
+        if pro_name and pro_name in PROJECT_BASE_INFO.keys():
+            return Response({pro_name: PROJECT_BASE_INFO[pro_name]})
         else:
             return Response({'error': '项目名有误，请确认！'})
 
@@ -98,7 +98,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
             item_key = data.get('item_key')
             values = data.get('values') if data.get('values') else 'none'
 
-            if pro_name not in PROBASEINFO.keys():
+            if pro_name not in PROJECT_BASE_INFO.keys():
                 return Response({'error': '该项目名不存在，请重新输入！'})
             else:
                 # 事务处理
@@ -107,10 +107,10 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
                     # print(values)
                     try:
                         # 将数据同步到内存变量中去
-                        if item_key in ITEMVALUES[pro_name].keys():
-                            ITEMVALUES[pro_name][item_key] = values
+                        if item_key in PROJECT_ITEM_VALUES[pro_name].keys():
+                            PROJECT_ITEM_VALUES[pro_name][item_key] = values
                         else:
-                            ITEMVALUES[pro_name].setdefault(item_key, values)
+                            PROJECT_ITEM_VALUES[pro_name].setdefault(item_key, values)
                         # print(ITEMVALUES[pro_name])
                     except Exception as e:
                         return Response({'error': e})
@@ -133,10 +133,10 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
         pro_name = request.GET.get('pro_name')
         item_key = request.GET.get('item_key')
 
-        if pro_name not in PROBASEINFO.keys():
+        if pro_name not in PROJECT_BASE_INFO.keys():
             return Response({'error': '项目名称不存在，请重新输入！'})
         else:
-            return Response({pro_name: ITEMVALUES[pro_name].get(item_key)})
+            return Response({pro_name: PROJECT_ITEM_VALUES[pro_name].get(item_key)})
 
     @list_route(methods=['GET'])
     def get_project_items(self, request, *args, **kwargs):
@@ -147,10 +147,10 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
         '''
         pro_name = request.GET.get('pro_name')
 
-        if pro_name not in PROBASEINFO.keys():
+        if pro_name not in PROJECT_BASE_INFO.keys():
             return Response({'error': '项目名称不存在，请重新输入！'})
         else:
-            return Response({pro_name: ITEMVALUES[pro_name]})
+            return Response({pro_name: PROJECT_ITEM_VALUES[pro_name]})
 
 
 
