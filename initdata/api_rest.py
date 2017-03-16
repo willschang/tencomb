@@ -110,7 +110,7 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
                         if item_key in PROJECT_ITEM_VALUES[pro_name].keys():
                             PROJECT_ITEM_VALUES[pro_name][item_key] = values
                             # 更新数据库数据
-                            ProjectItemValues.objects.filter(item_key=item_key).update(values=values)
+                            ProjectItemValues.objects.filter(pro_name=pro_name, item_key=item_key).update(values=values)
                         else:
                             PROJECT_ITEM_VALUES[pro_name].setdefault(item_key, values)
                             # 保存数据到数据库
