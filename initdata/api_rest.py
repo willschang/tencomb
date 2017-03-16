@@ -109,13 +109,16 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
                         # 将数据同步到内存变量中去
                         if item_key in PROJECT_ITEM_VALUES[pro_name].keys():
                             PROJECT_ITEM_VALUES[pro_name][item_key] = values
+                            # 更新数据库数据
+                            ProjectItemValues.objects.filter(item_key=item_key).update(values=values)
                         else:
                             PROJECT_ITEM_VALUES[pro_name].setdefault(item_key, values)
+                            # 保存数据到数据库
+                            serializer.save()
                         # print(ITEMVALUES[pro_name])
                     except Exception as e:
                         return Response({'error': e})
-                    # 保存数据到数据库
-                    serializer.save()
+                    
                     return Response({'status': 'ok'})
         else:
             error_info = serializer.errors
