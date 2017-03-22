@@ -14,6 +14,7 @@ pymysql==0.7.10
 
 ## Ubuntu服务器环境搭建：
 
+```
 sudo apt-get update
 ##### 安装python3.5
 sudo apt-get install -y python3.5
@@ -59,6 +60,6 @@ uwsgi --ini uwsgi.ini
 
 ##### 重启nginx，即可访问
 
-
+```
 
 
