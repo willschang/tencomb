@@ -127,7 +127,7 @@ DATABASES = {
         'NAME': 'tencomb',
         'USER': 'ten',
         'PASSWORD': '123456',
-        'HOST': '119.29.40.39',
+        'HOST': 'ip',
         'PORT': '3306',
         'STORAGE_ENGINE': 'INNODB',
         'OPTIONS': {},
