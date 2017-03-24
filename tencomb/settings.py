@@ -121,7 +121,7 @@ DATABASES = {
     #     'STORAGE_ENGINE': 'INNODB',
     #     'OPTIONS': {},
     # }
-    qcloud上数据库
+    # qcloud上数据库
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'tencomb',
