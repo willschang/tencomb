@@ -2,17 +2,22 @@
 
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .serializers import ProjectBaseInfoSerializer, ProjectItemValuesSerializer
+from .serializers import ProjectBaseInfoSerializer, ProjectItemValuesSerializer, DataArrayMemorySerializer
 from rest_framework.decorators import list_route, detail_route
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db import transaction
-from .models import ProjectBaseInfo, ProjectItemValues
+from .models import ProjectBaseInfo, ProjectItemValues, DataArrayMemory
 from .utils import data_initial
 
 # 存储平台上的各项目基础信息PROJECT_BASE_INFO
 PROJECT_BASE_INFO = data_initial.project_base_info
 # 存储平台上的各项目的各应用基础信息PROJECT_ITEM_VALUES
 PROJECT_ITEM_VALUES = data_initial.project_item_values
+# 存储平台上数据到COMB_DATA_MEMORY
+COMB_DATA_MEMORY = data_initial.comb_data_memory
+# 
+LATEST_ARRAY_INDEX = len(COMB_DATA_MEMORY) if len(COMB_DATA_MEMORY) else 0
+
 
 
 class ProjectBaseViewSet(viewsets.GenericViewSet):
@@ -154,6 +159,90 @@ class ProjectItemValuesViewSet(viewsets.GenericViewSet):
             return Response({'error': '项目名称不存在，请重新输入！'})
         else:
             return Response({pro_name: PROJECT_ITEM_VALUES[pro_name]})
+
+
+
+class DataArrayViewSet(viewsets.GenericViewSet):
+    '''
+    数据内存
+    '''
+    queryset = DataArrayMemory.objects.all()
+    serializer_class = DataArrayMemorySerializer
+
+
+    @list_route(methods=['POST'])
+    def set_data_memory(self, request, *args, **kwargs):
+        '''
+        设置数据到内存
+
+        '''        
+        values = request.data.get('values', None)
+        
+        if values:            
+            with transaction.atomic():
+                try:
+                    global LATEST_ARRAY_INDEX
+                    # 持久化数据
+                    data_memory = DataArrayMemory(array_index=LATEST_ARRAY_INDEX, values=values)
+                    data_memory.save()
+                    # 将数据存储到内存中
+                    COMB_DATA_MEMORY.append(values)
+
+                    LATEST_ARRAY_INDEX += 1
+                    return Response({'index': LATEST_ARRAY_INDEX-1})
+                except Exception as e:
+                    Response({'error': e})
+        else:
+            return Response({'error': '请输入数值'})  
+
+    @list_route(methods=['GET'])
+    def get_data_index(self, request, *args, **kwargs):
+        '''
+        索引值从内存中读取数据
+
+        index_value -- 索引值
+
+        '''
+        index_value = request.GET.get('index_value', None)
+
+        if index_value.isdigit():
+            global LATEST_ARRAY_INDEX
+            index_value = int(index_value)
+            if index_value < LATEST_ARRAY_INDEX:
+                return Response(COMB_DATA_MEMORY[index_value])
+            else:
+                return Response({'error': '输入的索引值不存在，请重新输入！'})
+
+        else:
+            return Response({'error': '索引值必须为数字，请重新输入！'})
+
+    @list_route(methods=['POST'])
+    def update_data_index(self, request, *args, **kwargs):
+        '''
+        通过索引值更新信息
+
+        index_value -- 索引值
+
+        '''
+        index_value = request.GET.get('index_value', None)
+        values = request.data.get('values', ' ')
+        # 判断输入值是否为数字
+        if index_value.isdigit():
+            global LATEST_ARRAY_INDEX
+            index_int = int(index_value)
+            # 判断索引值是否超出数组的index值
+            if index_int < LATEST_ARRAY_INDEX:
+                # 事务处理
+                with transaction.atomic():
+                    DataArrayMemory.objects.filter(array_index=index_int).update(values=values)
+                    # 更新值到数组里
+                    COMB_DATA_MEMORY[index_int] = values if values else ' '
+                return Response({index_value: COMB_DATA_MEMORY[index_int]})
+            else:
+                return Response({'error': '输入的索引值不存在，请重新输入！'})
+        else:
+            return Response({'error': '索引值必须为数字，请重新输入！'})
+
 
 
 

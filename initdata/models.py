@@ -18,4 +18,12 @@ class ProjectItemValues(models.Model):
     values = models.TextField('记录值', help_text='应用的基本信息, 如"192.168.1.10,xiamen china,80,..."')
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
+
+# 各项目的详细信息
+class DataArrayMemory(models.Model): 
+    array_index = models.BigIntegerField('数组index', db_index=True, unique=True, help_text='数组index')
+    values = models.TextField('记录值', help_text='应用的基本信息, 如"192.168.1.10,xiamen china,80,..."')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
     

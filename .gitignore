@@ -5,3 +5,9 @@
 
 *.sqlite3
 
+
+*.pyc
+
+initdata/__pycache__/api_urls.cpython-35.pyc
+
+initdata/__pycache__/api_urls.cpython-35.pyc
